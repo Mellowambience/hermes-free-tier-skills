@@ -74,7 +74,8 @@ def _post(key, model, messages, max_tokens, timeout):
         with urllib_request.urlopen(req, timeout=timeout) as r:
             return r.read().decode(), None
     except urllib_error.HTTPError as e:
-        return None, (e.code, e.read().decode()[:200])
+        reset = e.headers.get("X-RateLimit-Reset") if hasattr(e, "headers") else None
+        return None, (e.code, e.read().decode()[:400], reset)
     except Exception as e:
         return None, (0, str(e)[:160])
 
@@ -84,24 +85,25 @@ def probe_quota(key):
                      [{"role": "user", "content": "ping"}], 3, 30)
     if raw:
         return True, 0
-    code, msg = err
-    reset = 0
-    try:
-        j = json.loads(msg)
-        for path in [
-            lambda d: d["metadata"]["headers"]["X-RateLimit-Reset"],
-            lambda d: d["error"]["metadata"]["headers"]["X-RateLimit-Reset"],
-            lambda d: d["headers"]["X-RateLimit-Reset"],
-        ]:
-            try:
-                v = int(path(j))
-                if v:
-                    reset = v
-                    break
-            except Exception:
-                pass
-    except Exception:
-        pass
+    code, msg, reset_hdr = err
+    reset = int(reset_hdr) if (reset_hdr and str(reset_hdr).isdigit()) else 0
+    if not reset:
+        try:
+            j = json.loads(msg)
+            for path in [
+                lambda d: d["metadata"]["headers"]["X-RateLimit-Reset"],
+                lambda d: d["error"]["metadata"]["headers"]["X-RateLimit-Reset"],
+                lambda d: d["headers"]["X-RateLimit-Reset"],
+            ]:
+                try:
+                    v = int(path(j))
+                    if v:
+                        reset = v
+                        break
+                except Exception:
+                    pass
+        except Exception:
+            pass
     return False, reset
 
 def propose(key, model, prompt, tokens, timeout):
