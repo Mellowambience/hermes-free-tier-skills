@@ -1,0 +1,28 @@
+{
+  "name": "hermes-free-tier-skills",
+  "version": "0.1.0",
+  "description": "Shareable Hermes Agent skills for the free OpenRouter tier (quota-aware MOA + task router).",
+  "license": "MIT",
+  "skills": [
+    {
+      "name": "moa-free",
+      "category": "mlops",
+      "summary": "Quota-aware Mixture of Agents over free OpenRouter chat models.",
+      "entrypoint": "skills/moa-free/moa_all.py",
+      "skill_md": "skills/moa-free/SKILL.md",
+      "tags": ["MOA", "OpenRouter", "free-models", "synthesis"],
+      "platforms": ["windows", "linux", "macos"],
+      "dependencies": "stdlib-only"
+    },
+    {
+      "name": "model-advisor",
+      "category": "mlops",
+      "summary": "Task-aware router: classifies prompt and sends to the best free model for the job.",
+      "entrypoint": "skills/model-advisor/model_advisor.py",
+      "skill_md": "skills/model-advisor/SKILL.md",
+      "tags": ["routing", "advisor", "model-selection", "free-models"],
+      "platforms": ["windows", "linux", "macos"],
+      "dependencies": "stdlib-only"
+    }
+  ]
+}
