@@ -1,32 +1,36 @@
 # Hermes Free-Tier Skills Library
 
-A small, shareable collection of **Hermes Agent skills** built for the free /
-zero-budget OpenRouter tier. Each skill is a single portable Python script
-(stdlib only — no pip) plus a `SKILL.md`, ready to drop into
-`~/.hermes/skills/<category>/<name>/` or submit to the Hermes `optional-skills/`
-tree.
+A small, shareable collection of **Hermes Agent skills** that run models at
+**$0 and uncapped** via local Ollama, with optional OpenRouter `:free` fallback.
 
-## Why this exists
+## Why local-first (and why not just OpenRouter)
 
-OpenRouter's free models are great but rate-limited: a **daily** free-model
-request cap means naive "call all free models" burns the whole day's quota on
-one task. These skills are **quota-aware** — they probe the cap, run a small
-strength-ordered set, and queue + report the exact UTC reset instead of failing.
+OpenRouter's `:free` models are $0 per token but **rate-limited per day** — a
+naive "call all free models" burns the entire day's quota on one task and 429s.
+These skills default to **Ollama** (`http://localhost:11434/v1`): truly free,
+**no API key, no daily cap, unlimited runs**. OpenRouter is still available via
+`--backend openrouter` for when you want bigger free models and have quota.
 
 ## Skills
 
 | Skill | What it does | Key command |
 |-------|--------------|-------------|
-| `moa-free` | Mixture-of-Agents: fan a prompt across several free chat models, synthesize into one answer. | `python moa_all.py "prompt"` |
-| `model-advisor` | Task-aware router: classify prompt (code/creative/research/long/chat) and send to the best free model for that job. | `python model_advisor.py "prompt"` |
+| `moa-free` | Mixture-of-Agents: fan a prompt across several models, synthesize into one answer. | `python moa_all.py "prompt"` |
+| `model-advisor` | Task-aware router: classify prompt (code/creative/research/long/chat) and send to the best model for that job. | `python model_advisor.py "prompt"` |
 
-Both read `OPENROUTER_API_KEY` from the Hermes `.env` automatically and are
-cross-platform (Windows / Linux / macOS).
+Both read `OPENROUTER_API_KEY` from the Hermes `.env` ONLY when using
+`--backend openrouter`. Ollama needs no key. Cross-platform (Windows/Linux/macOS).
+
+## Prereqs (local backend)
+
+```bash
+ollama pull qwen2.5:3b qwen2.5:0.5b llama3.2-vision   # or any models you like
+# edit LOCAL_PROPOSERS / ROUTES_LOCAL in the scripts to match what you pulled
+```
 
 ## Install (local)
 
 ```bash
-# copy into your Hermes skills dir
 cp -r skills/moa-free   ~/.hermes/skills/mlops/moa-free
 cp -r skills/model-advisor ~/.hermes/skills/mlops/model-advisor
 ```
@@ -36,22 +40,23 @@ Or just run the scripts directly — they're standalone.
 ## Usage
 
 ```bash
-# MOA
+# MOA (local Ollama by default)
 python skills/moa-free/moa_all.py --list
 python skills/moa-free/moa_all.py "your prompt"
+python skills/moa-free/moa_all.py --backend openrouter "prompt"   # OR free models
 python skills/moa-free/moa_all.py --run-queue   # replay prompts queued during cap
 
-# Advisor
+# Advisor (local Ollama by default)
 python skills/model-advisor/model_advisor.py --show-routes
 python skills/model-advisor/model_advisor.py "write a python yaml parser"
-python skills/model-advisor/model_advisor.py --llm-classify "prompt"
+python skills/model-advisor/model_advisor.py --backend openrouter "prompt"
 ```
 
 ## Contributing
 
 Add a folder under `skills/<category>/<name>/` with a `SKILL.md` (Hermes format)
-and any script files. Keep scripts stdlib-only and quota-aware where they touch
-rate-limited APIs. Update `library.json` and this README.
+and any script files. Keep scripts stdlib-only and backend-agnostic where
+possible (Ollama default, optional cloud fallback). Update `library.json` + README.
 
 ## License
 
