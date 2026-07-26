@@ -17,6 +17,7 @@ These skills default to **Ollama** (`http://localhost:11434/v1`): truly free,
 |-------|--------------|-------------|
 | `moa-free` | Mixture-of-Agents: fan a prompt across several models, synthesize into one answer. | `python moa_all.py "prompt"` |
 | `model-advisor` | Task-aware router: classify prompt (code/creative/research/long/chat) and send to the best model for that job. | `python model_advisor.py "prompt"` |
+| `local-llm-routing` | Per-agent local model routing: pick + wire HF GGUF models via Ollama with offline fallback. | `cp -r skills/local-llm-routing ~/.hermes/skills/mlops/` |
 
 Both read `OPENROUTER_API_KEY` from the Hermes `.env` ONLY when using
 `--backend openrouter`. Ollama needs no key. Cross-platform (Windows/Linux/macOS).
