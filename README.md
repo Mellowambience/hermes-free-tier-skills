@@ -59,6 +59,11 @@ Add a folder under `skills/<category>/<name>/` with a `SKILL.md` (Hermes format)
 and any script files. Keep scripts stdlib-only and backend-agnostic where
 possible (Ollama default, optional cloud fallback). Update `library.json` + README.
 
+## Support
+
+If these skills saved you money or tokens, tips are appreciated:
+**CashApp `$MarsEatPlanet`**.
+
 ## License
 
 MIT — see LICENSE.
