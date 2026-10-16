@@ -3,6 +3,12 @@
 A small, shareable collection of **Hermes Agent skills** that run models at
 **$0 and uncapped** via local Ollama, with optional OpenRouter `:free` fallback.
 
+## At a glance
+
+- **Mixture-of-Agents (`moa-free`):** fans one prompt across several models and synthesizes a single answer.
+- **Task-aware router (`model-advisor`):** classifies a prompt (code, creative, research, long, chat) and sends it to the best model for that job.
+- **Quota-aware by design:** defaults to local Ollama (no key, no cap) and falls back to OpenRouter only when asked, so a run never burns the day's free quota.
+
 ## Why local-first (and why not just OpenRouter)
 
 OpenRouter's `:free` models are $0 per token but **rate-limited per day** — a
